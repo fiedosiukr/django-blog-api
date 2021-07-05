@@ -16,6 +16,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     categories = models.ManyToManyField(Category, related_name='posts')
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.title} - {self.author.username}'
