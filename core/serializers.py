@@ -20,11 +20,24 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
-    categories = CategorySerializer(many=True, read_only=True)
+    categories = CategorySerializer(many=True)
 
     class Meta:
         model = Post
         fields = '__all__'
+
+    def create(self, validated_data):
+        categories_data = validated_data.pop('categories')
+        post = Post.objects.create(**validated_data)
+
+        for category in categories_data:
+            try:
+                obj = Category.objects.get(name=category['name'])
+            except Category.DoesNotExist:
+                obj = Category.objects.create(name=category['name'])
+            post.categories.add(obj)
+
+        return post
 
 
 class CommentSerializer(serializers.ModelSerializer):
